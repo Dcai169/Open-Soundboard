@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Open Soundboard</title>
+  <!-- <link rel="stylesheet" href="index.css"> -->
+  <link rel="stylesheet" href="./contents/bootstrap-4.5.2-dist/css/bootstrap.min.css">
+  <script>const $ = require('jquery');</script>
+  <script>require('popper.js');</script>
+  <script>require('bootstrap');</script>
+</head>
+
+<body style="display: grid; grid-template-columns: 1fr minmax(350px, 40%);">
+  <div class="container">
+    <div class="m-3"></div>
+    <div id="list-parent" style="display: grid; place-items: center;">
+      <h2 id="no-binds-msg">You haven't added any bindings yet.</h2>
+    </div>
+  </div>
+  <div class="inspector container" style="background-color: #bbb; height: 100vh;">
+    <div class="m-2"></div>
+    <div class="container" id="binding-parent" style="display: grid; place-items: center;">
+      <div class="container">
+        <form action="">
+          <div class="row">
+            <div class="form-group">
+              <label for="name-input">Name</label>
+              <input class="form-control" type="text" name="name">
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group">
+              <label for="file-path-input">File</label>
+              <input class="form-control-file" type="file" name="file-path" id="file-path-input" accept="audio/*">
+              <small class="form-text text-muted">Supported Formats: MP3, MP4, WAV, FLAC</small>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group">
+              <div class="row">
+                <div class="col-9">
+                  <label for="keybind-input">Keybind</label>
+                  <input class="form-control" type="text" name="keybinding" id="keybind-input">
+                </div>
+                <div class="col-3" style="display: grid; place-items: center;">
+                  <p class="label"> </p>
+                  <button class="btn btn-light" type="button" id="keybind-record-button">Record</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- <div class="row">
+            <div class="col-2 form-group" style="display: grid; place-items: center;">
+              <button class="btn btn-primary" type="button">Save</button>
+            </div>
+          </div> -->
+        </form>
+        <hr>
+      </div>
+
+      <button class="btn btn-secondary" id="add-binding-button" type="button">Add +</button>
+    </div>
+  </div>
+
+
+  <script src="config-render.js"></script>
+</body>
+
+</html>
