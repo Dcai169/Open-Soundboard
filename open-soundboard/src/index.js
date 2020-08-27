@@ -1,7 +1,10 @@
-const { app, BrowserWindow, ipcRenderer, ipcMain, globalShortcut } = require('electron');
+const { app, BrowserWindow, globalShortcut, ipcRenderer, ipcMain, Menu, MenuItem, Tray } = require('electron');
 const path = require('path');
 const fs = require('fs');
-var bindings = require('./../data/binding-config.json');
+const Binding = require('./Binding');
+var config = require('./../data/binding-config.json');
+
+let tray = null // placeholder for tray
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -25,7 +28,17 @@ const createWindow = () => {
   mainWindow.webContents.openDevTools();
 
   // Send bindings to renderer process.
-  mainWindow.webContents.send('sync-bindings', JSON.stringify(bindings));
+  mainWindow.webContents.send('sync-config', JSON.stringify(config));
+
+  // Create Tray Icon
+  if (!tray) {
+    tray = new Tray('./src/contents/placeholder_icon.png');
+    tray.setToolTip('Open Soundboard');
+    tray.setContextMenu(Menu.buildFromTemplate([
+      { label: 'Configure', type: 'normal', click: (menuItem, browserWindow, event) => { (BrowserWindow.getAllWindows().length === 0 ? createWindow() : mainWindow.focus()) } },
+      { label: 'Quit', type: 'normal', click: (menuItem, browserWindow, event) => { app.quit() } },
+    ]));
+  }
 };
 
 // This method will be called when Electron has finished
@@ -37,8 +50,10 @@ app.on('ready', createWindow);
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
+  if (!config["close-to-tray"]) {
+    if (process.platform !== 'darwin') {
+      app.quit();
+    }
   }
 });
 
@@ -59,6 +74,21 @@ async function readBindings() {
 }
 
 ipcMain.handle('add-binding', async (event, arg) => {
-  console.log(arg);
-  return "200 OK";
+  let newBind = JSON.parse(arg);
+  console.log(newBind);
+
+  // Stuff to do when user registers a new binding
+  globalShortcut.register(newBind.key_bind, generate_callback(newBind));
+  return 200;
 });
+
+function generate_callback(bind) {
+  // Add binding to config file
+  config.bindings.push(bind);
+
+  // Return a function to be used as a callback on shortcut press
+  return () => {
+    console.log(bind.file_path);
+  };
+}
+

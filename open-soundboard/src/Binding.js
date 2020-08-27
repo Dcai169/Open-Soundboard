@@ -3,6 +3,7 @@ class Binding {
         this.name = name;
         this.file_path = file_path;
         this.key_bind = key_bind;
+        this.active = true;
     }
 };
 

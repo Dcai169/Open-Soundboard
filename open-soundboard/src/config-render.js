@@ -4,6 +4,7 @@ const Binding = require('./Binding');
 var bindings = require('./../data/binding-config.json');
 
 // DOM Elements
+var nameInput = document.getElementById('name-input');
 var fileInput = document.getElementById('file-path-input');
 var keybindInput = document.getElementById('keybind-input');
 var keybindRecordButton = $('#keybind-record-button');
@@ -104,9 +105,14 @@ function keyEventToReadableString(codedEvent) {
 
 function replaceCmdCtrl() {
     accelString = keybindInput.value;
-    if (process.platform === 'darwin') {
-        
+    let re = new RegExp('(Ctrl)|(Cmd)', 'gi');
+    
+    if (!!keybindInput.value.match(re)) {
+        accelString = keybindInput.value.replace(re, "");
+        accelString = "CmdOrCtrl" + accelString;
     }
+
+    return accelString;
 }
 
 function setButtonState(state) {
@@ -164,12 +170,12 @@ document.getElementById('keybind-record-button').addEventListener('click', (ev) 
 
 keybindInput.addEventListener('focusin', (ev) => {
     setButtonState(true);
-
 });
 
 document.getElementById('add-binding-button').addEventListener("click", () => {
-    ipcRenderer.invoke('add-binding', 'bind data').then((res) => {
+    let newBind = new Binding(nameInput.value, fileInput.files[0].path, replaceCmdCtrl());
+    ipcRenderer.invoke('add-binding', JSON.stringify(newBind)).then((res) => {
         console.log(res);
     });
-    console.log('add button clicked')
+    // console.log('add button clicked');
 });
